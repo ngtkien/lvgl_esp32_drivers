@@ -12,6 +12,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "driver/gpio.h"
 
 /*********************
  *      DEFINES
@@ -159,10 +160,10 @@ void ra8875_init(void)
 #endif
 
     // Initialize non-SPI GPIOs
-    gpio_pad_select_gpio(RA8875_RST);
+    esp_rom_gpio_pad_select_gpio(RA8875_RST);
     gpio_set_direction(RA8875_RST, GPIO_MODE_OUTPUT);
 #ifdef CONFIG_LV_DISP_PIN_BCKL
-    gpio_pad_select_gpio(CONFIG_LV_DISP_PIN_BCKL);
+    esp_rom_gpio_pad_select_gpio(CONFIG_LV_DISP_PIN_BCKL);
     gpio_set_direction(CONFIG_LV_DISP_PIN_BCKL, GPIO_MODE_OUTPUT);
 #endif
 
@@ -180,23 +181,91 @@ void ra8875_init(void)
     // Send all the commands
     for (i = 0; i < INIT_CMDS_SIZE; i++) {
         ra8875_write_cmd(init_cmds[i].cmd, init_cmds[i].data);
-    }
+        switch (init_cmds[i].cmd) {
+        case RA8875_REG_SYSR:
+            printf("Command RA8875_REG_SYSR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_HDWR:
+            printf("Command RA8875_REG_HDWR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_HNDFTR:
+            printf("Command RA8875_REG_HNDFTR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_HNDR:
+            printf("Command RA8875_REG_HNDR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_HSTR:
+            printf("Command RA8875_REG_HSTR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_HPWR:
+            printf("Command RA8875_REG_HPWR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_VDHR0:
+            printf("Command RA8875_REG_VDHR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_VDHR1:
+            printf("Command RA8875_REG_VDHR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_VNDR0:
+            printf("Command RA8875_REG_VNDR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_VNDR1:
+            printf("Command RA8875_REG_VNDR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_VSTR0:
+            printf("Command RA8875_REG_VSTR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_VSTR1:
+            printf("Command RA8875_REG_VSTR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_VPWR:
+            printf("Command RA8875_REG_VPWR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_DPCR:
+            printf("Command RA8875_REG_DPCR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_MWCR0:
+            printf("Command RA8875_REG_MWCR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_MWCR1:
+            printf("Command RA8875_REG_MWCR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_LTPR0:
+            printf("Command RA8875_REG_LTPR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        case RA8875_REG_LTPR1:
+            printf("Command RA8875_REG_LTPR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            break;
+        default:
+            printf("None");
+        }
 
+
+    }
+    uint8_t ret = 0x00;
     // Perform a memory clear (wait maximum of 100 ticks)
     ra8875_write_cmd(RA8875_REG_MCLR, 0x80);
     for(i = 100; i != 0; i--) {
-        if ((ra8875_read_cmd(RA8875_REG_MCLR) & 0x80) == 0x00) {
+        // Check if the memory is cleared
+        ret = ra8875_read_cmd(RA8875_REG_MCLR) && 0x80;
+        if (ret == 0x00) {
             break;
         }
+        ESP_LOGI(TAG, "ret: %x", ret);
         vTaskDelay(1);
     }
     if (i == 0) {
         ESP_LOGW(TAG, "WARNING: Memory clear timed out; RA8875 may be unresponsive.");
     }
-
+    
+    ret = ra8875_read_cmd(0x00);
+    ESP_LOGI(TAG, "ret: %d", ret);
     // Enable the display and backlight
     ra8875_enable_display(true);
-    ra8875_enable_backlight(true);
+
+    ra8875_gpiox(true);
+    ra8875_PWM1out(255);
+    // ra8875_enable_backlight(true);
 }
 
 void ra8875_enable_backlight(bool backlight)
@@ -363,3 +432,38 @@ static void ra8875_send_buffer(uint8_t * data, size_t length, bool signal_flush)
                           | (RA8875_MODE_DATA_WRITE);          // Data write mode
     disp_spi_transaction(data, length, flags, NULL, prefix, 0);
 }
+
+
+void ra8875_gpiox(bool on) {
+  ESP_LOGI(TAG,"GPIOX on: %d", on);
+  if (on)
+    ra8875_write_cmd(RA8875_GPIOX, 1);
+  else
+    ra8875_write_cmd(RA8875_GPIOX, 0);
+}
+
+void ra8875_PWM1config(bool on, uint8_t clock) {
+  if (on) {
+    ra8875_write_cmd(RA8875_P1CR, RA8875_P1CR_ENABLE | (clock & 0xF));
+  } else {
+    ra8875_write_cmd(RA8875_P1CR, RA8875_P1CR_DISABLE | (clock & 0xF));
+  }
+}
+
+/**************************************************************************/
+/*!
+    Set the duty cycle of the PWM 1 Clock
+
+    @param p The duty Cycle (0-255)
+*/
+/**************************************************************************/
+void ra8875_PWM1out(uint8_t p) { ra8875_write_cmd(RA8875_P1DCR, p); }
+
+/**************************************************************************/
+/*!
+     Set the duty cycle of the PWM 2 Clock
+
+     @param p The duty Cycle (0-255)
+*/
+/**************************************************************************/
+void ra8875_PWM2out(uint8_t p) { ra8875_write_cmd(RA8875_P2DCR, p); }

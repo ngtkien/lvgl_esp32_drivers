@@ -24,6 +24,7 @@
 #include "lvgl/src/lv_core/lv_refr.h"
 #endif
 
+
 /*********************
  *      DEFINES
  *********************/
@@ -204,6 +205,7 @@ bool lvgl_spi_driver_init(int host,
     int dma_channel,
     int quadwp_pin, int quadhd_pin)
 {
+    ESP_LOGI(TAG, "Choose SPI host %d", host);
 #if defined (CONFIG_IDF_TARGET_ESP32)
     assert((SPI_HOST <= host) && (VSPI_HOST >= host));
     const char *spi_names[] = {
@@ -213,6 +215,10 @@ bool lvgl_spi_driver_init(int host,
     assert((SPI_HOST <= host) && (HSPI_HOST >= host));
     const char *spi_names[] = {
         "SPI_HOST", "", ""
+    };
+#elif defined (CONFIG_IDF_TARGET_ESP32S3)
+    const char *spi_names[] = {
+        "SPI_HOST", "SPI2_HOST", "SPI3_HOST"
     };
 #endif
 
@@ -232,7 +238,7 @@ bool lvgl_spi_driver_init(int host,
     };
 
     ESP_LOGI(TAG, "Initializing SPI bus...");
-    esp_err_t ret = spi_bus_initialize(host, &buscfg, dma_channel);
+    esp_err_t ret = spi_bus_initialize(host, &buscfg, SPI_DMA_CH_AUTO);
     assert(ret == ESP_OK);
 
     return ESP_OK != ret;

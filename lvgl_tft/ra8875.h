@@ -87,6 +87,20 @@ extern "C" {
 #define RA8875_REG_INTC1  (0xF0)     // Interrupt Control Register1 (INTC1)
 #define RA8875_REG_INTC2  (0xF1)     // Interrupt Control Register1 (INTC2)
 
+
+#define RA8875_GPIOX (0xC7) ///< See datasheet
+#define RA8875_P1CR 0x8A         ///< See datasheet
+#define RA8875_P1CR_ENABLE 0x80  ///< See datasheet
+#define RA8875_P1CR_DISABLE 0x00 ///< See datasheet
+#define RA8875_P1CR_CLKOUT 0x10  ///< See datasheet
+#define RA8875_P1CR_PWMOUT 0x00  ///< See datasheet
+#define RA8875_P1DCR 0x8B ///< See datasheet
+#define RA8875_P2CR_ENABLE 0x80  ///< See datasheet
+#define RA8875_P2CR_DISABLE 0x00 ///< See datasheet
+#define RA8875_P2CR_CLKOUT 0x10  ///< See datasheet
+#define RA8875_P2CR_PWMOUT 0x00  ///< See datasheet
+#define RA8875_P2DCR 0x8D ///< See datasheet
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -106,6 +120,11 @@ void ra8875_sleep_out(void);
 uint8_t ra8875_read_cmd(uint8_t cmd);
 void ra8875_write_cmd(uint8_t cmd, uint8_t data);
 
+
+void ra8875_gpiox(bool on);
+void ra8875_PWM1config(bool on, uint8_t clock);
+void ra8875_PWM1out(uint8_t p);
+void ra8875_PWM2out(uint8_t p);
 /**********************
  *      MACROS
  **********************/
