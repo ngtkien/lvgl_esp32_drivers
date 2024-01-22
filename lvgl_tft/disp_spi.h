@@ -66,6 +66,7 @@ void disp_spi_release(void);
 
 static inline void disp_spi_send_data(uint8_t *data, size_t length) {
     disp_spi_transaction(data, length, DISP_SPI_SEND_POLLING, NULL, 0, 0);
+    // disp_spi_transaction(data, length, DISP_SPI_MODE_DIO, NULL, 0, 0);
 }
 
 static inline void disp_spi_send_colors(uint8_t *data, size_t length) {

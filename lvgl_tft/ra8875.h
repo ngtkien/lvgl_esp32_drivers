@@ -101,6 +101,23 @@ extern "C" {
 #define RA8875_P2CR_PWMOUT 0x00  ///< See datasheet
 #define RA8875_P2DCR 0x8D ///< See datasheet
 
+#define RA8875_PWM_CLK_DIV1 0x00     ///< See datasheet
+#define RA8875_PWM_CLK_DIV2 0x01     ///< See datasheet
+#define RA8875_PWM_CLK_DIV4 0x02     ///< See datasheet
+#define RA8875_PWM_CLK_DIV8 0x03     ///< See datasheet
+#define RA8875_PWM_CLK_DIV16 0x04    ///< See datasheet
+#define RA8875_PWM_CLK_DIV32 0x05    ///< See datasheet
+#define RA8875_PWM_CLK_DIV64 0x06    ///< See datasheet
+#define RA8875_PWM_CLK_DIV128 0x07   ///< See datasheet
+#define RA8875_PWM_CLK_DIV256 0x08   ///< See datasheet
+#define RA8875_PWM_CLK_DIV512 0x09   ///< See datasheet
+#define RA8875_PWM_CLK_DIV1024 0x0A  ///< See datasheet
+#define RA8875_PWM_CLK_DIV2048 0x0B  ///< See datasheet
+#define RA8875_PWM_CLK_DIV4096 0x0C  ///< See datasheet
+#define RA8875_PWM_CLK_DIV8192 0x0D  ///< See datasheet
+#define RA8875_PWM_CLK_DIV16384 0x0E ///< See datasheet
+#define RA8875_PWM_CLK_DIV32768 0x0F ///< See datasheet
+
 #define RA8875_PLLC1 0x88         ///< See datasheet
 #define RA8875_PLLC1_PLLDIV2 0x80 ///< See datasheet
 #define RA8875_PLLC1_PLLDIV1 0x00 ///< See datasheet
@@ -114,34 +131,49 @@ extern "C" {
 #define RA8875_PLLC2_DIV32 0x05  ///< See datasheet
 #define RA8875_PLLC2_DIV64 0x06  ///< See datasheet
 #define RA8875_PLLC2_DIV128 0x07 ///< See datasheet
-/**********************
- *      TYPEDEFS
- **********************/
 
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
+#define RA8875_DCR 0x90                   ///< See datasheet
+#define RA8875_DCR_LINESQUTRI_START 0x80  ///< See datasheet
+#define RA8875_DCR_LINESQUTRI_STOP 0x00   ///< See datasheet
+#define RA8875_DCR_LINESQUTRI_STATUS 0x80 ///< See datasheet
+#define RA8875_DCR_CIRCLE_START 0x40      ///< See datasheet
+#define RA8875_DCR_CIRCLE_STATUS 0x40     ///< See datasheet
+#define RA8875_DCR_CIRCLE_STOP 0x00       ///< See datasheet
+#define RA8875_DCR_FILL 0x20              ///< See datasheet
+#define RA8875_DCR_NOFILL 0x00            ///< See datasheet
+#define RA8875_DCR_DRAWLINE 0x00          ///< See datasheet
+#define RA8875_DCR_DRAWTRIANGLE 0x01      ///< See datasheet
+#define RA8875_DCR_DRAWSQUARE 0x10        ///< See datasheet
 
-void ra8875_init(void);
-void ra8875_enable_backlight(bool backlight);
-void ra8875_enable_display(bool enable);
-void ra8875_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_map);
+    /**********************
+     *      TYPEDEFS
+     **********************/
 
-void ra8875_sleep_in(void);
-void ra8875_sleep_out(void);
+    /**********************
+     * GLOBAL PROTOTYPES
+     **********************/
 
-uint8_t ra8875_read_cmd(uint8_t cmd);
-void ra8875_write_cmd(uint8_t cmd, uint8_t data);
+    void ra8875_init(void);
+    void ra8875_enable_backlight(bool backlight);
+    void ra8875_enable_display(bool enable);
+    void ra8875_flush(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map);
 
+    void ra8875_sleep_in(void);
+    void ra8875_sleep_out(void);
 
-void ra8875_gpiox(bool on);
-void ra8875_PWM1config(bool on, uint8_t clock);
-void ra8875_PWM1out(uint8_t p);
-void ra8875_PWM2out(uint8_t p);
+    uint8_t ra8875_read_cmd(uint8_t cmd);
+    void ra8875_write_cmd(uint8_t cmd, uint8_t data);
 
-/**********************
- *      MACROS
- **********************/
+    void ra8875_gpiox(bool on);
+    void ra8875_PWM1config(bool on, uint8_t clock);
+    void ra8875_PWM1out(uint8_t p);
+    void ra8875_PWM2out(uint8_t p);
+
+    void rectHelper(int16_t x, int16_t y, int16_t w, int16_t h,
+                    uint16_t color, bool filled);
+    /**********************
+     *      MACROS
+     **********************/
 
 
 #ifdef __cplusplus
