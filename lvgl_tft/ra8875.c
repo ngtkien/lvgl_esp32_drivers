@@ -32,7 +32,7 @@
 #if (LV_COLOR_DEPTH == 8)
     #define SYSR_VAL (0x00)
 #elif (LV_COLOR_DEPTH == 16)
-    #define SYSR_VAL (0x08)
+    #define SYSR_VAL (0x0c)
 #else
     #error "Unsupported color depth (LV_COLOR_DEPTH)"
 #endif
@@ -128,8 +128,10 @@ void ra8875_init(void)
     } init_cmds[] = {
         {RA8875_REG_SYSR,   SYSR_VAL},                 // System Configuration Register (SYSR)
         {RA8875_REG_HDWR,   HDWR_VAL},                 // LCD Horizontal Display Width Register (HDWR)
-        {RA8875_REG_HNDFTR, HNDFTR_VAL},               // Horizontal Non-Display Period Fine Tuning Option Register (HNDFTR)
-        {RA8875_REG_HNDR,   HNDR_VAL},                 // Horizontal Non-Display Period Register (HNDR)
+        // {RA8875_REG_HNDFTR, HNDFTR_VAL},               // Horizontal Non-Display Period Fine Tuning Option Register (HNDFTR)
+        {RA8875_REG_HNDFTR, 0},               // Horizontal Non-Display Period Fine Tuning Option Register (HNDFTR)
+        // {RA8875_REG_HNDR,   HNDR_VAL},                 // Horizontal Non-Display Period Register (HNDR)
+        {RA8875_REG_HNDR,   3},                 // Horizontal Non-Display Period Register (HNDR)
         {RA8875_REG_HSTR,   HSTR_VAL},                 // HSYNC Start Position Register (HSTR)
         {RA8875_REG_HPWR,   HPWR_VAL},                 // HSYNC Pulse Width Register (HPWR)
         {RA8875_REG_VDHR0,  VDHR_VAL & 0x0FF},         // LCD Vertical Display Height Register (VDHR0)
@@ -139,6 +141,16 @@ void ra8875_init(void)
         {RA8875_REG_VSTR0,  VSTR_VAL & 0x0FF},         // VSYNC Start Position Register (VSTR0)
         {RA8875_REG_VSTR1,  VSTR_VAL >> 8},            // VSYNC Start Position Register (VSTR1)
         {RA8875_REG_VPWR,   VPWR_VAL},                 // VSYNC Pulse Width Register (VPWR)
+        //
+        {RA8875_REG_HSAW0,  0x00},                     // Horizontal Start Point 0 of Active Window (HSAW0)
+        {RA8875_REG_HSAW1,  0x00},                     // Horizontal Start Point 1 of Active Window (HSAW1)
+        {RA8875_REG_VSAW0,  0x00},                     // Vertical Start Point 0 of Active Window (VSAW0)
+        {RA8875_REG_VSAW1,  0x00},                     // Vertical Start Point 1 of Active Window (VSAW1)
+        {RA8875_REG_HEAW0,  0x1f},                     // Horizontal End Point 0 of Active Window (HEAW0)
+        {RA8875_REG_HEAW1,  0x03},                     // Horizontal End Point 1 of Active Window (HEAW1)
+        {RA8875_REG_VEAW0,  0xdf},                     // Vertical End Point of Active Window 0 (VEAW0)
+        {RA8875_REG_VEAW1,  0x01},                     // Vertical End Point of Active Window 1 (VEAW1)
+        //
         {RA8875_REG_DPCR,   DPCR_VAL},                 // Display Configuration Register (DPCR)
         {RA8875_REG_MWCR0,  0x00},                     // Memory Write Control Register 0 (MWCR0)
         {RA8875_REG_MWCR1,  0x00},                     // Memory Write Control Register 1 (MWCR1)
@@ -178,66 +190,68 @@ void ra8875_init(void)
     ra8875_configure_clocks(true);
     disp_spi_change_device_speed(-1);
 
+    // PLL setting for RA8875
+
     // Send all the commands
     for (i = 0; i < INIT_CMDS_SIZE; i++) {
         ra8875_write_cmd(init_cmds[i].cmd, init_cmds[i].data);
         switch (init_cmds[i].cmd) {
         case RA8875_REG_SYSR:
-            printf("Command RA8875_REG_SYSR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_SYSR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_HDWR:
-            printf("Command RA8875_REG_HDWR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_HDWR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_HNDFTR:
-            printf("Command RA8875_REG_HNDFTR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_HNDFTR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_HNDR:
-            printf("Command RA8875_REG_HNDR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_HNDR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_HSTR:
-            printf("Command RA8875_REG_HSTR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_HSTR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_HPWR:
-            printf("Command RA8875_REG_HPWR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_HPWR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_VDHR0:
-            printf("Command RA8875_REG_VDHR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_VDHR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_VDHR1:
-            printf("Command RA8875_REG_VDHR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_VDHR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_VNDR0:
-            printf("Command RA8875_REG_VNDR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_VNDR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_VNDR1:
-            printf("Command RA8875_REG_VNDR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_VNDR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_VSTR0:
-            printf("Command RA8875_REG_VSTR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_VSTR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_VSTR1:
-            printf("Command RA8875_REG_VSTR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_VSTR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_VPWR:
-            printf("Command RA8875_REG_VPWR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_VPWR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_DPCR:
-            printf("Command RA8875_REG_DPCR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_DPCR:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_MWCR0:
-            printf("Command RA8875_REG_MWCR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_MWCR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_MWCR1:
-            printf("Command RA8875_REG_MWCR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_MWCR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_LTPR0:
-            printf("Command RA8875_REG_LTPR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_LTPR0:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         case RA8875_REG_LTPR1:
-            printf("Command RA8875_REG_LTPR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
+            ESP_LOGI(TAG,"Command RA8875_REG_LTPR1:  Register 0x%x, Value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
             break;
         default:
-            printf("None");
+            ESP_LOGI(TAG,"cmd 0x%x value 0x%x\n", init_cmds[i].cmd, init_cmds[i].data);
         }
 
 
@@ -259,7 +273,7 @@ void ra8875_init(void)
     }
     
     ret = ra8875_read_cmd(0x00);
-    ESP_LOGI(TAG, "ret: %d", ret);
+    ESP_LOGI(TAG, "ret: %x", ret);
     // Enable the display and backlight
     ra8875_enable_display(true);
 
@@ -391,13 +405,16 @@ void ra8875_configure_clocks(bool high_speed)
 
     val = high_speed ? ((CONFIG_LV_DISP_RA8875_PLLDIVM << 7) | CONFIG_LV_DISP_RA8875_PLLDIVN) : 0x07;
     ra8875_write_cmd(RA8875_REG_PLLC1, val);           // PLL Control Register 1 (PLLC1)
+    ESP_LOGI(TAG, "PLLC1: Reg: 0x%02X Val: 0x%02X PLLDIVM: 0x%02X, PLLDIVN 0x%02X", RA8875_REG_PLLC1, val, CONFIG_LV_DISP_RA8875_PLLDIVM, CONFIG_LV_DISP_RA8875_PLLDIVN);
     vTaskDelay(1);
 
     val = high_speed ? CONFIG_LV_DISP_RA8875_PLLDIVK : 0x03;
     ra8875_write_cmd(RA8875_REG_PLLC2, val);           // PLL Control Register 2 (PLLC2)
+    ESP_LOGI(TAG, "PLLC2: Reg: 0x%02X Val: 0x%02X PLLDIVK: 0x%02X", RA8875_REG_PLLC2, val, CONFIG_LV_DISP_RA8875_PLLDIVK);
     vTaskDelay(1);
 
     ra8875_write_cmd(RA8875_REG_PCSR, PCSR_VAL);            // Pixel Clock Setting Register (PCSR)
+    ESP_LOGI(TAG, "PCSR: Reg: 0x%02X Val: 0x%02X", RA8875_REG_PCSR, PCSR_VAL);
     vTaskDelay(DIV_ROUND_UP(20, portTICK_RATE_MS));
 }
 
@@ -457,7 +474,10 @@ void ra8875_PWM1config(bool on, uint8_t clock) {
     @param p The duty Cycle (0-255)
 */
 /**************************************************************************/
-void ra8875_PWM1out(uint8_t p) { ra8875_write_cmd(RA8875_P1DCR, p); }
+void ra8875_PWM1out(uint8_t p) { 
+    ESP_LOGI(TAG,"ra8875_PWM1out: %d", p);
+    ra8875_write_cmd(RA8875_P1DCR, p); }
+
 
 /**************************************************************************/
 /*!
@@ -467,3 +487,73 @@ void ra8875_PWM1out(uint8_t p) { ra8875_write_cmd(RA8875_P1DCR, p); }
 */
 /**************************************************************************/
 void ra8875_PWM2out(uint8_t p) { ra8875_write_cmd(RA8875_P2DCR, p); }
+void ra8875_PLLinit(void) {
+//   if (_size == RA8875_480x80 || _size == RA8875_480x128 ||
+//       _size == RA8875_480x272) {
+//     writeReg(RA8875_PLLC1, RA8875_PLLC1_PLLDIV1 + 10);
+//     delay(1);
+//     writeReg(RA8875_PLLC2, RA8875_PLLC2_DIV4);
+//     delay(1);
+//   } else /* (_size == RA8875_800x480) */ {
+//     writeReg(RA8875_PLLC1, RA8875_PLLC1_PLLDIV1 + 11);
+//     delay(1);
+//     writeReg(RA8875_PLLC2, RA8875_PLLC2_DIV4);
+//     delay(1);
+//   }
+   ra8875_write_cmd(RA8875_PLLC1, RA8875_PLLC1_PLLDIV1 + 11);
+
+    vTaskDelay(DIV_ROUND_UP(1, portTICK_RATE_MS));
+    ra8875_write_cmd(RA8875_PLLC2, RA8875_PLLC2_DIV4);
+    vTaskDelay(DIV_ROUND_UP(1, portTICK_RATE_MS));
+}
+
+void rectHelper(int16_t x, int16_t y, int16_t w, int16_t h,
+                                 uint16_t color, bool filled) {
+  x = applyRotationX(x);
+  y = applyRotationY(y);
+  w = applyRotationX(w);
+  h = applyRotationY(h);
+
+  /* Set X */
+  writeCommand(0x91);
+  writeData(x);
+  writeCommand(0x92);
+  writeData(x >> 8);
+
+  /* Set Y */
+  writeCommand(0x93);
+  writeData(y);
+  writeCommand(0x94);
+  writeData(y >> 8);
+
+  /* Set X1 */
+  writeCommand(0x95);
+  writeData(w);
+  writeCommand(0x96);
+  writeData((w) >> 8);
+
+  /* Set Y1 */
+  writeCommand(0x97);
+  writeData(h);
+  writeCommand(0x98);
+  writeData((h) >> 8);
+
+  /* Set Color */
+  writeCommand(0x63);
+  writeData((color & 0xf800) >> 11);
+  writeCommand(0x64);
+  writeData((color & 0x07e0) >> 5);
+  writeCommand(0x65);
+  writeData((color & 0x001f));
+
+  /* Draw! */
+  writeCommand(RA8875_DCR);
+  if (filled) {
+    writeData(0xB0);
+  } else {
+    writeData(0x90);
+  }
+
+  /* Wait for the command to finish */
+  waitPoll(RA8875_DCR, RA8875_DCR_LINESQUTRI_STATUS);
+}

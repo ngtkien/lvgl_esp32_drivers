@@ -101,6 +101,19 @@ extern "C" {
 #define RA8875_P2CR_PWMOUT 0x00  ///< See datasheet
 #define RA8875_P2DCR 0x8D ///< See datasheet
 
+#define RA8875_PLLC1 0x88         ///< See datasheet
+#define RA8875_PLLC1_PLLDIV2 0x80 ///< See datasheet
+#define RA8875_PLLC1_PLLDIV1 0x00 ///< See datasheet
+
+#define RA8875_PLLC2 0x89        ///< See datasheet
+#define RA8875_PLLC2_DIV1 0x00   ///< See datasheet
+#define RA8875_PLLC2_DIV2 0x01   ///< See datasheet
+#define RA8875_PLLC2_DIV4 0x02   ///< See datasheet
+#define RA8875_PLLC2_DIV8 0x03   ///< See datasheet
+#define RA8875_PLLC2_DIV16 0x04  ///< See datasheet
+#define RA8875_PLLC2_DIV32 0x05  ///< See datasheet
+#define RA8875_PLLC2_DIV64 0x06  ///< See datasheet
+#define RA8875_PLLC2_DIV128 0x07 ///< See datasheet
 /**********************
  *      TYPEDEFS
  **********************/
@@ -125,6 +138,7 @@ void ra8875_gpiox(bool on);
 void ra8875_PWM1config(bool on, uint8_t clock);
 void ra8875_PWM1out(uint8_t p);
 void ra8875_PWM2out(uint8_t p);
+
 /**********************
  *      MACROS
  **********************/
