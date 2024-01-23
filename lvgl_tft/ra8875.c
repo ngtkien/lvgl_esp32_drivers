@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define DEBUG false
+#define DEBUG true
 #define TAG "RA8875"
 
 #define DIV_ROUND_UP(n, d) (((n)+(d)-1)/(d))
@@ -317,7 +317,6 @@ void ra8875_enable_display(bool enable)
     uint8_t val = enable ? (0x80) : (0x00);
     ra8875_write_cmd(RA8875_REG_PWRR, val);            // Power and Display Control Register (PWRR)
 }
-
 
 void ra8875_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_map)
 {
